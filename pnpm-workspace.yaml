@@ -1,0 +1,13 @@
+allowBuilds:
+  '@google/genai': false
+  protobufjs: false
+
+minimumReleaseAge: 2880 # 2 days
+
+minimumReleaseAgeExclude:
+  - "@ai-sdk/*"
+  - "@eve/*"
+  - "@workflow/*"
+  - ai
+  - eve
+  - workflow

@@ -27,6 +27,17 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@ai-sdk/harness": "^1.0.87",
+    "@ai-sdk/harness-claude-code": "^1.0.90",
+    "@ai-sdk/harness-cline": "^1.0.14",
+    "@ai-sdk/harness-codex": "^1.0.89",
+    "@ai-sdk/harness-deepagents": "^1.0.87",
+    "@ai-sdk/harness-grok-build": "^1.0.24",
+    "@ai-sdk/harness-opencode": "^1.0.88",
+    "@ai-sdk/harness-pi": "^1.0.89",
+    "@standard-schema/spec": "^1.1.0",
+    "@vercel/sandbox-drives": "npm:@vercel/sandbox@^2.10.0-beta.0",
+    "ai": "^7.0.79",
     "zod": "4.4.3"
   },
   "devDependencies": {
@@ -36,9 +47,9 @@
   },
   "peerDependencies": {
     "eve": "*"
-  }
-,
+  },
   "engines": {
     "node": "24.x"
-  }
+  },
+  "packageManager": "pnpm@11.23.0"
 }
