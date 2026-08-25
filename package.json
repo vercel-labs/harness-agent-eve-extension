@@ -1,0 +1,44 @@
+{
+  "name": "harness-agent-eve-extension",
+  "version": "0.0.0",
+  "type": "module",
+  "eve": {
+    "extension": {
+      "source": "./extension",
+      "dist": "./dist/extension"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./tools": {
+      "types": "./dist/tools/index.d.ts",
+      "default": "./dist/tools/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "eve extension build",
+    "prepare": "eve extension build",
+    "typecheck": "tsc"
+  },
+  "dependencies": {
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "24.x",
+    "eve": "0.44.4",
+    "typescript": "7.0.2"
+  },
+  "peerDependencies": {
+    "eve": "*"
+  }
+,
+  "engines": {
+    "node": "24.x"
+  }
+}
