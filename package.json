@@ -5,7 +5,13 @@
   "eve": {
     "extension": {
       "source": "./extension",
-      "dist": "./dist/extension"
+      "dist": "./dist/extension",
+      "externalDependencies": [
+        "@ai-sdk/harness-claude-code",
+        "@ai-sdk/harness-codex",
+        "@ai-sdk/harness-deepagents",
+        "@ai-sdk/harness-opencode"
+      ]
     }
   },
   "files": [
