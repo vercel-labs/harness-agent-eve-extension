@@ -14,7 +14,9 @@ export const HARNESS_AGENT_HARNESSES = [
   "claude-code",
   "cline",
   "codex",
+  "cursor",
   "deepagents",
+  "fx",
   "grok-build",
   "opencode",
   "pi",
@@ -23,7 +25,9 @@ export const HARNESS_AGENT_HARNESSES = [
 const BRIDGE_HARNESSES = new Set<HarnessAgentHarness>([
   "claude-code",
   "codex",
+  "cursor",
   "deepagents",
+  "fx",
   "grok-build",
   "opencode",
 ]);
@@ -53,8 +57,12 @@ export async function loadHarnessAdapter(input: {
       );
     case "codex":
       return (await import("@ai-sdk/harness-codex")).createCodex(bridgeSettings(input));
+    case "cursor":
+      return (await import("@ai-sdk/harness-cursor")).createCursor(bridgeSettings(input));
     case "deepagents":
       return (await import("@ai-sdk/harness-deepagents")).createDeepAgents(bridgeSettings(input));
+    case "fx":
+      return (await import("@ai-sdk/harness-fx")).createFx(bridgeSettings(input));
     case "grok-build":
       return (await import("@ai-sdk/harness-grok-build")).createGrokBuild(bridgeSettings(input));
     case "opencode":

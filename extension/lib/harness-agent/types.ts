@@ -4,7 +4,9 @@ export type HarnessAgentHarness =
   | "claude-code"
   | "cline"
   | "codex"
+  | "cursor"
   | "deepagents"
+  | "fx"
   | "grok-build"
   | "opencode"
   | "pi";

@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/harness':
         specifier: ^1.0.87
         version: 1.0.87(ws@8.21.0)(zod@4.4.3)
+      '@ai-sdk/harness-acp':
+        specifier: ^1.0.25
+        version: 1.0.25(zod@4.4.3)
       '@ai-sdk/harness-claude-code':
         specifier: ^1.0.90
         version: 1.0.90(zod@4.4.3)
@@ -20,9 +23,15 @@ importers:
       '@ai-sdk/harness-codex':
         specifier: ^1.0.89
         version: 1.0.89(zod@4.4.3)
+      '@ai-sdk/harness-cursor':
+        specifier: ^1.0.0
+        version: 1.0.0(ws@8.21.0)(zod@4.4.3)
       '@ai-sdk/harness-deepagents':
         specifier: ^1.0.87
         version: 1.0.87(zod@4.4.3)
+      '@ai-sdk/harness-fx':
+        specifier: ^1.0.0
+        version: 1.0.0(ws@8.21.0)(zod@4.4.3)
       '@ai-sdk/harness-grok-build':
         specifier: ^1.0.24
         version: 1.0.24(ws@8.21.0)(zod@4.4.3)
@@ -130,8 +139,20 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/harness-cursor@1.0.0':
+    resolution: {integrity: sha512-tPXL3APhjO7GTkec7BDWGhlohBoh7yP2YrGDvMwuc3ktcPeKHMV6qV5lSsAXkJ4Zu59XamwQq6SnAAMciWdJ/Q==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/harness-deepagents@1.0.87':
     resolution: {integrity: sha512-u70OSHTvcgQiQqx4zgMhcd6y9ij5WOArnaHqU9Ok40fM6C+FtLkRTEKIOBnWjcDqeB7gQ6Q4D45ixPiKYCyn2A==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/harness-fx@1.0.0':
+    resolution: {integrity: sha512-MtSbRugA/i/5w6AOVbroxuqcvIPKI68Vmys1EessGgI1xhcmIYlyjqhnO4V52igcV5hbPDdbNwBAIuaTygwXPQ==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2469,6 +2490,17 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  '@ai-sdk/harness-cursor@1.0.0(ws@8.21.0)(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/harness': 1.0.87(ws@8.21.0)(zod@4.4.3)
+      '@ai-sdk/harness-acp': 1.0.25(zod@4.4.3)
+      '@ai-sdk/provider-utils': 5.0.30(zod@4.4.3)
+      zod: 4.4.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - ws
+
   '@ai-sdk/harness-deepagents@1.0.87(zod@4.4.3)':
     dependencies:
       '@ai-sdk/harness': 1.0.87(ws@8.21.0)(zod@4.4.3)
@@ -2478,6 +2510,17 @@ snapshots:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+
+  '@ai-sdk/harness-fx@1.0.0(ws@8.21.0)(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/harness': 1.0.87(ws@8.21.0)(zod@4.4.3)
+      '@ai-sdk/harness-acp': 1.0.25(zod@4.4.3)
+      '@ai-sdk/provider-utils': 5.0.30(zod@4.4.3)
+      zod: 4.4.3
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+      - ws
 
   '@ai-sdk/harness-grok-build@1.0.24(ws@8.21.0)(zod@4.4.3)':
     dependencies:
