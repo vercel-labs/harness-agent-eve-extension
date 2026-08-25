@@ -55,6 +55,25 @@ importers:
         specifier: 7.0.2
         version: 7.0.2
 
+  examples/coding-agent:
+    dependencies:
+      eve:
+        specifier: 0.44.4
+        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.79(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+      harness-agent-eve-extension:
+        specifier: workspace:*
+        version: link:../..
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.x
+        version: 24.13.3
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
 packages:
 
   '@ai-sdk/amazon-bedrock@5.0.62':
@@ -4086,6 +4105,53 @@ snapshots:
       undici: 8.9.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
+    transitivePeerDependencies:
+      - '@azure/app-configuration'
+      - '@azure/cosmos'
+      - '@azure/data-tables'
+      - '@azure/identity'
+      - '@azure/keyvault-secrets'
+      - '@azure/storage-blob'
+      - '@capacitor/preferences'
+      - '@deno/kv'
+      - '@electric-sql/pglite'
+      - '@libsql/client'
+      - '@netlify/blobs'
+      - '@netlify/runtime'
+      - '@planetscale/database'
+      - '@upstash/redis'
+      - '@vercel/blob'
+      - '@vercel/functions'
+      - '@vercel/kv'
+      - '@vercel/queue'
+      - aws4fetch
+      - better-sqlite3
+      - chokidar
+      - dotenv
+      - drizzle-orm
+      - giget
+      - idb-keyval
+      - ioredis
+      - jiti
+      - lru-cache
+      - miniflare
+      - mongodb
+      - mysql2
+      - rollup
+      - sqlite3
+      - uploadthing
+      - vite
+      - wrangler
+      - xml2js
+      - zephyr-agent
+
+  eve@0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.79(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2):
+    dependencies:
+      ai: 7.0.79(zod@4.4.3)
+      nitro: 3.0.260610-beta(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+      undici: 8.9.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
