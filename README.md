@@ -16,6 +16,43 @@ export default harnessAgent({
 
 With this configuration, your agent will expose a flexible `harness_agent` tool that your eve agent can delegate tasks to. You will be asked to approve the `harness_agent` tool every time the eve agent wants to use it.
 
+### Preconfigured purpose-specific tools
+
+Use `fixedHarnessAgentTools` to expose additional HarnessAgent tools with fixed settings for specific purposes, such as reviewing code or running a security audit:
+
+```ts
+import harnessAgent from "harness-agent-eve-extension";
+
+export default harnessAgent({
+  exposeDynamicHarnessAgentTool: true,
+  fixedHarnessAgentTools: [
+    {
+      name: "code_review_harness_agent",
+      description: "Review code changes in the repository and report findings.",
+      harnesses: ["claude-code", "codex"],
+      instructions: "You are a meticulous code reviewer...",
+      workingDirectory: "ms",
+    },
+    {
+      name: "security_audit_harness_agent",
+      description: "Audit the repository for security vulnerabilities.",
+      harnesses: "all",
+      instructions: "You are a security auditor...",
+      workingDirectory: "ms",
+    },
+  ],
+});
+```
+
+Each entry exposes one tool, named by its `name` (lowercase letters, digits, and underscores). The calling model only chooses the `task` and, among the enabled `harnesses`, the `harness` to run; everything else is fixed from the config:
+
+- `description` (required): model-facing tool description.
+- `harnesses`: `"all"` (the default) or a non-empty allowlist of supported harnesses.
+- `models`: optional model override per harness; omitted harnesses use their native default model.
+- `instructions`, `skills`, `workingDirectory`, `id`: the HarnessAgent settings, with the same shapes as the `harness_agent` tool input.
+
+All values must be JSON-serializable. When `fixedHarnessAgentTools` is omitted or empty, no additional tools are exposed. Fixed tools always return the harness's text output as a string; configuring an output schema is not supported.
+
 ### Example
 
 This repo includes a basic coding agent example in `examples/coding-agent`. You can use it for testing the extension end-to-end.

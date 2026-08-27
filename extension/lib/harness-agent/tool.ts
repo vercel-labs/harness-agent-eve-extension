@@ -23,7 +23,12 @@ const skillSchema = z.strictObject({
   name: z.string(),
 });
 
-const configurableSettingsShape = {
+/**
+ * Zod shape for the serializable {@link HarnessAgentSettings} fields. Shared
+ * by the dynamic `harness_agent` tool input and the extension config for
+ * preconfigured fixed HarnessAgent tools.
+ */
+export const HARNESS_AGENT_SETTINGS_SHAPE = {
   id: z.string().describe("Optional stable identifier for this HarnessAgent instance.").optional(),
   instructions: z.string().describe("Instructions for the selected coding harness.").optional(),
   skills: z
@@ -36,14 +41,32 @@ const configurableSettingsShape = {
     .optional(),
 };
 
+/** Zod schema for a single supported harness name. */
+export const HARNESS_AGENT_HARNESS_SCHEMA = z.enum(HARNESS_AGENT_HARNESSES);
+
+/**
+ * Zod schema for the harness allowlist of a fixed HarnessAgent tool: either
+ * `"all"` or a non-empty list of supported harnesses.
+ */
+export const HARNESS_AGENT_HARNESSES_SCHEMA = z.union([
+  z.literal("all"),
+  z.array(HARNESS_AGENT_HARNESS_SCHEMA).nonempty(),
+]);
+
+/** Zod schema for the per-harness model overrides of a fixed HarnessAgent tool. */
+export const HARNESS_AGENT_MODELS_SCHEMA = z.partialRecord(
+  HARNESS_AGENT_HARNESS_SCHEMA,
+  z.string().min(1),
+);
+
 export const DYNAMIC_HARNESS_AGENT_TOOL_INPUT_SCHEMA = z.strictObject({
-  harness: z.enum(HARNESS_AGENT_HARNESSES).describe("Coding harness to run."),
+  harness: HARNESS_AGENT_HARNESS_SCHEMA.describe("Coding harness to run."),
   model: z
     .string()
     .describe("Optional model override. Omit this to use the harness's default model.")
     .optional(),
   task: z.string().describe("Task for the coding harness to complete."),
-  ...configurableSettingsShape,
+  ...HARNESS_AGENT_SETTINGS_SHAPE,
 });
 
 type CreateFixedHarnessAgentToolRuntimeSettings = Omit<
@@ -56,21 +79,71 @@ export async function executeDynamicHarnessAgentTool(input: {
   readonly sandbox: SandboxSession;
   readonly toolInput: DynamicHarnessAgentToolInput;
 }): Promise<string> {
+  const { harness, model, task, ...settings } = input.toolInput;
+  return await runHarnessAgent<string>({
+    abortSignal: input.abortSignal,
+    harness,
+    model,
+    sandbox: input.sandbox,
+    settings,
+    task,
+  });
+}
+
+/**
+ * Serializable settings accepted by {@link executeFixedHarnessAgentTool}.
+ * These mirror `CreateFixedHarnessAgentToolSettings` without an
+ * `outputSchema`: preconfigured fixed HarnessAgent tools always return the
+ * harness's text output as a string.
+ */
+export type FixedHarnessAgentToolRuntimeSettings = Omit<
+  CreateFixedHarnessAgentToolSettings<undefined>,
+  "description" | "outputSchema"
+>;
+
+export async function executeFixedHarnessAgentTool(input: {
+  readonly abortSignal?: AbortSignal;
+  readonly sandbox: SandboxSession;
+  readonly settings: FixedHarnessAgentToolRuntimeSettings;
+  readonly toolInput: FixedHarnessAgentToolInput;
+}): Promise<string> {
+  const { harnesses, models, ...settings } = input.settings;
+  const enabledHarnesses = resolveEnabledHarnesses(harnesses);
+  if (!enabledHarnesses.includes(input.toolInput.harness)) {
+    throw new Error(
+      `Harness "${input.toolInput.harness}" is not enabled for this fixed HarnessAgent tool.`,
+    );
+  }
+  validateModels({ enabledHarnesses, models });
   return await runHarnessAgent<string>({
     abortSignal: input.abortSignal,
     harness: input.toolInput.harness,
-    model: input.toolInput.model,
+    model: models?.[input.toolInput.harness],
     sandbox: input.sandbox,
-    settings: input.toolInput,
+    settings,
     task: input.toolInput.task,
+  });
+}
+
+/**
+ * Zod input schema for a fixed HarnessAgent tool whose enabled harnesses are
+ * known in advance.
+ */
+export function createFixedHarnessAgentToolInputSchema(
+  enabledHarnesses: readonly [HarnessAgentHarness, ...HarnessAgentHarness[]],
+) {
+  return z.strictObject({
+    harness: z.enum(enabledHarnesses).describe("Preconfigured coding harness to run."),
+    task: z.string().describe("Task for the coding harness to complete."),
   });
 }
 
 export function createFixedHarnessAgentToolRuntime(
   settings: CreateFixedHarnessAgentToolRuntimeSettings,
 ) {
-  const enabledHarnesses = resolveEnabledHarnesses(settings.harnesses);
-  validateModels({ enabledHarnesses, models: settings.models });
+  const { harnesses, models, outputSchema, ...agentSettings } = settings;
+  const enabledHarnesses = resolveEnabledHarnesses(harnesses);
+  validateModels({ enabledHarnesses, models });
 
   return {
     async execute(input: {
@@ -81,15 +154,17 @@ export function createFixedHarnessAgentToolRuntime(
       return await runHarnessAgent({
         abortSignal: input.abortSignal,
         harness: input.toolInput.harness,
-        model: settings.models?.[input.toolInput.harness],
-        outputSchema: settings.outputSchema,
+        model: models?.[input.toolInput.harness],
+        outputSchema,
         sandbox: input.sandbox,
-        settings,
+        settings: agentSettings,
         task: input.toolInput.task,
       });
     },
-    inputSchema: createFixedInputSchema(enabledHarnesses),
-    outputSchema: settings.outputSchema,
+    inputSchema: createFixedHarnessAgentToolInputSchema(
+      enabledHarnesses as [HarnessAgentHarness, ...HarnessAgentHarness[]],
+    ),
+    outputSchema,
   };
 }
 
@@ -112,13 +187,6 @@ function resolveEnabledHarnesses(
     }
   }
   return enabled;
-}
-
-function createFixedInputSchema(enabledHarnesses: readonly HarnessAgentHarness[]) {
-  return z.strictObject({
-    harness: z.enum(enabledHarnesses).describe("Preconfigured coding harness to run."),
-    task: z.string().describe("Task for the coding harness to complete."),
-  });
 }
 
 function validateModels(input: {
