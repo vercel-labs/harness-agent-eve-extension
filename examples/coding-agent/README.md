@@ -22,3 +22,15 @@ Ask something like:
 Or:
 
 > Use the Codex harness to add different locale support to ms, e.g. so that strings like "2 Tage" work just as well as "2 days".
+
+## Fixed harness agent tools
+
+The example also preconfigures three purpose-specific tools via `fixedHarnessAgentTools` in `agent/extensions/harness-agent.ts`, each pinned to the `ms` working directory:
+
+- `explain_code` — explains code read-only, concisely.
+- `review_code` — reviews code read-only and starts its reply with APPROVED, NEUTRAL, or CHANGES-REQUESTED.
+- `security_audit` — audits the repository for security flaws and starts its reply with PASS, NEUTRAL, or FAIL.
+
+Ask something like:
+
+> Use the explain_code tool to walk me through the parser in ms.
