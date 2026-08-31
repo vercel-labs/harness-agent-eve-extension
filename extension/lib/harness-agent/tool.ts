@@ -29,15 +29,23 @@ const skillSchema = z.strictObject({
  * preconfigured fixed HarnessAgent tools.
  */
 export const HARNESS_AGENT_SETTINGS_SHAPE = {
-  id: z.string().describe("Optional stable identifier for this HarnessAgent instance.").optional(),
-  instructions: z.string().describe("Instructions for the selected coding harness.").optional(),
+  id: z
+    .string()
+    .describe("Optional stable identifier for this HarnessAgent instance.")
+    .optional(),
+  instructions: z
+    .string()
+    .describe("Instructions for the selected coding harness.")
+    .optional(),
   skills: z
     .array(skillSchema)
     .describe("Skills made available to the selected coding harness.")
     .optional(),
   workingDirectory: z
     .string()
-    .describe("Workspace-relative directory in which the coding harness should work.")
+    .describe(
+      "Workspace-relative directory in which the coding harness should work."
+    )
     .optional(),
 };
 
@@ -56,21 +64,25 @@ export const HARNESS_AGENT_HARNESSES_SCHEMA = z.union([
 /** Zod schema for the per-harness model overrides of a fixed HarnessAgent tool. */
 export const HARNESS_AGENT_MODELS_SCHEMA = z.partialRecord(
   HARNESS_AGENT_HARNESS_SCHEMA,
-  z.string().min(1),
+  z.string().min(1)
 );
 
 export const DYNAMIC_HARNESS_AGENT_TOOL_INPUT_SCHEMA = z.strictObject({
   harness: HARNESS_AGENT_HARNESS_SCHEMA.describe("Coding harness to run."),
   model: z
     .string()
-    .describe("Optional model override. Omit this to use the harness's default model.")
+    .describe(
+      "Optional model override. Omit this to use the harness's default model."
+    )
     .optional(),
   task: z.string().describe("Task for the coding harness to complete."),
   ...HARNESS_AGENT_SETTINGS_SHAPE,
 });
 
 type CreateFixedHarnessAgentToolRuntimeSettings = Omit<
-  CreateFixedHarnessAgentToolSettings<StandardJSONSchemaV1<unknown, unknown> | undefined>,
+  CreateFixedHarnessAgentToolSettings<
+    StandardJSONSchemaV1<unknown, unknown> | undefined
+  >,
   "description"
 >;
 
@@ -111,7 +123,7 @@ export async function executeFixedHarnessAgentTool(input: {
   const enabledHarnesses = resolveEnabledHarnesses(harnesses);
   if (!enabledHarnesses.includes(input.toolInput.harness)) {
     throw new Error(
-      `Harness "${input.toolInput.harness}" is not enabled for this fixed HarnessAgent tool.`,
+      `Harness "${input.toolInput.harness}" is not enabled for this fixed HarnessAgent tool.`
     );
   }
   validateModels({ enabledHarnesses, models });
@@ -130,16 +142,18 @@ export async function executeFixedHarnessAgentTool(input: {
  * known in advance.
  */
 export function createFixedHarnessAgentToolInputSchema(
-  enabledHarnesses: readonly [HarnessAgentHarness, ...HarnessAgentHarness[]],
+  enabledHarnesses: readonly [HarnessAgentHarness, ...HarnessAgentHarness[]]
 ) {
   return z.strictObject({
-    harness: z.enum(enabledHarnesses).describe("Preconfigured coding harness to run."),
+    harness: z
+      .enum(enabledHarnesses)
+      .describe("Preconfigured coding harness to run."),
     task: z.string().describe("Task for the coding harness to complete."),
   });
 }
 
 export function createFixedHarnessAgentToolRuntime(
-  settings: CreateFixedHarnessAgentToolRuntimeSettings,
+  settings: CreateFixedHarnessAgentToolRuntimeSettings
 ) {
   const { harnesses, models, outputSchema, ...agentSettings } = settings;
   const enabledHarnesses = resolveEnabledHarnesses(harnesses);
@@ -162,24 +176,28 @@ export function createFixedHarnessAgentToolRuntime(
       });
     },
     inputSchema: createFixedHarnessAgentToolInputSchema(
-      enabledHarnesses as [HarnessAgentHarness, ...HarnessAgentHarness[]],
+      enabledHarnesses as [HarnessAgentHarness, ...HarnessAgentHarness[]]
     ),
     outputSchema,
   };
 }
 
 function resolveEnabledHarnesses(
-  harnesses: CreateFixedHarnessAgentToolSettings["harnesses"],
+  harnesses: CreateFixedHarnessAgentToolSettings["harnesses"]
 ): readonly HarnessAgentHarness[] {
   if (harnesses === undefined || harnesses === "all") {
     return HARNESS_AGENT_HARNESSES;
   }
   if (!Array.isArray(harnesses)) {
-    throw new Error('createFixedHarnessAgentTool harnesses must be "all" or an allowlist.');
+    throw new Error(
+      'createFixedHarnessAgentTool harnesses must be "all" or an allowlist.'
+    );
   }
   const enabled = [...new Set(harnesses)];
   if (enabled.length === 0) {
-    throw new Error("createFixedHarnessAgentTool requires at least one enabled harness.");
+    throw new Error(
+      "createFixedHarnessAgentTool requires at least one enabled harness."
+    );
   }
   for (const harness of enabled) {
     if (!HARNESS_AGENT_HARNESSES.includes(harness)) {
@@ -202,10 +220,14 @@ function validateModels(input: {
       throw new Error(`Unknown HarnessAgent harness model key "${harness}".`);
     }
     if (!enabled.has(harness as HarnessAgentHarness)) {
-      throw new Error(`A model was configured for disabled HarnessAgent harness "${harness}".`);
+      throw new Error(
+        `A model was configured for disabled HarnessAgent harness "${harness}".`
+      );
     }
     if (typeof model !== "string" || model.trim().length === 0) {
-      throw new Error(`HarnessAgent model for "${harness}" must be a non-empty string.`);
+      throw new Error(
+        `HarnessAgent model for "${harness}" must be a non-empty string.`
+      );
     }
   }
 }

@@ -30,11 +30,13 @@ export interface CreateDynamicHarnessAgentToolSettings {
  * the current eve sandbox.
  */
 export function createDynamicHarnessAgentTool(
-  settings: CreateDynamicHarnessAgentToolSettings = {},
+  settings: CreateDynamicHarnessAgentToolSettings = {}
 ): ToolDefinition<DynamicHarnessAgentToolInput, string> {
   return {
     approval: always(),
-    description: settings.description ?? DEFAULT_DYNAMIC_HARNESS_AGENT_TOOL_DESCRIPTION,
+    description:
+      settings.description ?? DEFAULT_DYNAMIC_HARNESS_AGENT_TOOL_DESCRIPTION,
+    // biome-ignore lint/plugin: eve ToolDefinition execute signature is (input, ctx)
     async execute(input, ctx) {
       return await executeDynamicHarnessAgentTool({
         abortSignal: ctx.abortSignal,
@@ -51,10 +53,13 @@ export function createFixedHarnessAgentTool<
 >(
   settings: CreateFixedHarnessAgentToolSettings<TOutputSchema> & {
     readonly outputSchema: TOutputSchema;
-  },
-): ToolDefinition<FixedHarnessAgentToolInput, StandardJSONSchemaV1.InferOutput<TOutputSchema>>;
+  }
+): ToolDefinition<
+  FixedHarnessAgentToolInput,
+  StandardJSONSchemaV1.InferOutput<TOutputSchema>
+>;
 export function createFixedHarnessAgentTool(
-  settings: CreateFixedHarnessAgentToolSettings,
+  settings: CreateFixedHarnessAgentToolSettings
 ): ToolDefinition<FixedHarnessAgentToolInput, string>;
 
 /**
@@ -63,13 +68,16 @@ export function createFixedHarnessAgentTool(
  * are fixed in code. The calling model chooses only the task and harness.
  */
 export function createFixedHarnessAgentTool(
-  settings: CreateFixedHarnessAgentToolSettings<StandardJSONSchemaV1<unknown, unknown> | undefined>,
+  settings: CreateFixedHarnessAgentToolSettings<
+    StandardJSONSchemaV1<unknown, unknown> | undefined
+  >
 ): unknown {
   const { description, ...runtimeSettings } = settings;
   const runtime = createFixedHarnessAgentToolRuntime(runtimeSettings);
   const definition: ToolDefinition<FixedHarnessAgentToolInput, unknown> = {
     approval: always(),
     description,
+    // biome-ignore lint/plugin: eve ToolDefinition execute signature is (input, ctx)
     async execute(input, ctx) {
       return await runtime.execute({
         abortSignal: ctx.abortSignal,

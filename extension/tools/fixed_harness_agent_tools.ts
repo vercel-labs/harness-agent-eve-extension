@@ -32,6 +32,7 @@ export default defineDynamic({
       if (entries.length === 0) {
         return null;
       }
+      // biome-ignore lint/plugin: Object.fromEntries is the right tool for building a named tool map
       return Object.fromEntries(
         entries.map((entry) => {
           const settings = {
@@ -42,13 +43,15 @@ export default defineDynamic({
             skills: entry.skills,
             workingDirectory: entry.workingDirectory,
           };
-          const enabledHarnesses = resolveEnabledHarnessNames(settings.harnesses);
+          const enabledHarnesses = resolveEnabledHarnessNames(
+            settings.harnesses
+          );
           return [
             entry.name,
             defineTool({
               approval: always(),
               description: entry.description,
-              inputSchema: createFixedHarnessAgentToolInputSchema(enabledHarnesses),
+              // biome-ignore lint/plugin: eve ToolDefinition execute signature is (input, ctx)
               async execute(input, ctx) {
                 return await executeFixedHarnessAgentTool({
                   abortSignal: ctx.abortSignal,
@@ -57,19 +60,24 @@ export default defineDynamic({
                   toolInput: input,
                 });
               },
+              inputSchema:
+                createFixedHarnessAgentToolInputSchema(enabledHarnesses),
             }),
           ];
-        }),
+        })
       );
     },
   },
 });
 
 function resolveEnabledHarnessNames(
-  harnesses: "all" | readonly HarnessAgentHarness[] | undefined,
+  harnesses: "all" | readonly HarnessAgentHarness[] | undefined
 ): [HarnessAgentHarness, ...HarnessAgentHarness[]] {
   if (harnesses === undefined || harnesses === "all") {
     return [...HARNESS_AGENT_HARNESSES];
   }
-  return [...new Set(harnesses)] as [HarnessAgentHarness, ...HarnessAgentHarness[]];
+  return [...new Set(harnesses)] as [
+    HarnessAgentHarness,
+    ...HarnessAgentHarness[],
+  ];
 }

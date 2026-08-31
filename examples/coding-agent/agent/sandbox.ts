@@ -8,7 +8,8 @@ export default defineSandbox({
   async bootstrap({ use }) {
     const sandbox = await use();
     await runSandboxCommand({
-      command: "git clone --depth 1 --branch main https://github.com/vercel/ms.git /workspace/ms",
+      command:
+        "git clone --depth 1 --branch main https://github.com/vercel/ms.git /workspace/ms",
       sandbox,
     });
     await installDependencies({ sandbox });
@@ -24,7 +25,9 @@ export default defineSandbox({
   },
 });
 
-async function installDependencies(input: { readonly sandbox: SandboxSession }): Promise<void> {
+async function installDependencies(input: {
+  readonly sandbox: SandboxSession;
+}): Promise<void> {
   await runSandboxCommand({
     command: "pnpm install --frozen-lockfile",
     sandbox: input.sandbox,
@@ -47,6 +50,6 @@ async function runSandboxCommand(input: {
 
   const output = result.stderr.trim() || result.stdout.trim();
   throw new Error(
-    `Sandbox command failed with exit code ${result.exitCode}: ${input.command}${output === "" ? "" : `\n${output}`}`,
+    `Sandbox command failed with exit code ${result.exitCode}: ${input.command}${output === "" ? "" : `\n${output}`}`
   );
 }

@@ -12,15 +12,15 @@ export type HarnessAgentHarness =
   | "pi";
 
 export interface HarnessAgentSkillFile {
-  readonly path: string;
   readonly content: string;
+  readonly path: string;
 }
 
 export interface HarnessAgentSkill {
-  readonly name: string;
-  readonly description: string;
   readonly content: string;
+  readonly description: string;
   readonly files?: readonly HarnessAgentSkillFile[];
+  readonly name: string;
 }
 
 export interface HarnessAgentSettings {
@@ -31,18 +31,20 @@ export interface HarnessAgentSettings {
 }
 
 export interface DynamicHarnessAgentToolInput extends HarnessAgentSettings {
-  readonly task: string;
   readonly harness: HarnessAgentHarness;
   readonly model?: string;
+  readonly task: string;
 }
 
 export interface FixedHarnessAgentToolInput {
-  readonly task: string;
   readonly harness: HarnessAgentHarness;
+  readonly task: string;
 }
 
 export interface CreateFixedHarnessAgentToolSettings<
-  TOutputSchema extends StandardJSONSchemaV1<unknown, unknown> | undefined = undefined,
+  TOutputSchema extends
+    | StandardJSONSchemaV1<unknown, unknown>
+    | undefined = undefined,
 > extends HarnessAgentSettings {
   /** Model-facing description for this preconfigured HarnessAgent tool. */
   readonly description: string;

@@ -33,7 +33,7 @@ export default defineDynamic({
         description:
           extension.config.dynamicHarnessAgentToolDescription ??
           DEFAULT_DYNAMIC_HARNESS_AGENT_TOOL_DESCRIPTION,
-        inputSchema: DYNAMIC_HARNESS_AGENT_TOOL_INPUT_SCHEMA,
+        // biome-ignore lint/plugin: eve ToolDefinition execute signature is (input, ctx)
         async execute(input, ctx) {
           return await executeDynamicHarnessAgentTool({
             abortSignal: ctx.abortSignal,
@@ -41,6 +41,7 @@ export default defineDynamic({
             toolInput: input,
           });
         },
+        inputSchema: DYNAMIC_HARNESS_AGENT_TOOL_INPUT_SCHEMA,
       });
     },
   },

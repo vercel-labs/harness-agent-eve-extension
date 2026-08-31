@@ -10,7 +10,7 @@ const HARNESS_ROOT = "/workspace/.eve-harness";
 const HARNESS_TEMP = `${HARNESS_ROOT}/tmp`;
 
 type VercelSandbox = Awaited<
-  ReturnType<(typeof import("@vercel/sandbox-drives"))["Sandbox"]["get"]>
+  ReturnType<typeof import("@vercel/sandbox-drives")["Sandbox"]["get"]>
 >;
 
 type HarnessSandboxSession = SandboxSession & {
@@ -20,8 +20,8 @@ type HarnessSandboxSession = SandboxSession & {
 
 export interface HarnessSandboxHandle {
   readonly bridge?: HarnessBridgeSettings;
+  readonly dispose: () => Promise<void>;
   readonly session: HarnessSandboxSession;
-  dispose(): Promise<void>;
 }
 
 export async function createHarnessSandboxHandle(input: {
@@ -29,6 +29,7 @@ export async function createHarnessSandboxHandle(input: {
   readonly harness: HarnessAgentHarness;
 }): Promise<HarnessSandboxHandle> {
   let bridge: HarnessBridgeSettings | undefined;
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op for non-bridge harnesses
   let dispose = async () => {};
   let session = adaptSandboxSession(input.sandbox);
   if (harnessUsesBridge(input.harness)) {
@@ -63,16 +64,21 @@ export async function createHarnessSandboxHandle(input: {
 function adaptSandboxSession(sandbox: SandboxSession): HarnessSandboxSession {
   return {
     defaultWorkingDirectory: HARNESS_ROOT,
-    description: "An eve sandbox with the agent workspace mounted at /workspace.",
+    description:
+      "An eve sandbox with the agent workspace mounted at /workspace.",
+    id: sandbox.id,
     readBinaryFile: sandbox.readBinaryFile,
     readFile: sandbox.readFile,
     readTextFile: sandbox.readTextFile,
+    removePath: sandbox.removePath,
+    resolvePath: sandbox.resolvePath,
     async run(options) {
       return await sandbox.run({
         ...options,
         env: { ...options.env, TMPDIR: HARNESS_TEMP },
       });
     },
+    setNetworkPolicy: sandbox.setNetworkPolicy,
     async spawn(options) {
       return await sandbox.spawn({
         ...options,
@@ -82,10 +88,6 @@ function adaptSandboxSession(sandbox: SandboxSession): HarnessSandboxSession {
     writeBinaryFile: sandbox.writeBinaryFile,
     writeFile: sandbox.writeFile,
     writeTextFile: sandbox.writeTextFile,
-    id: sandbox.id,
-    removePath: sandbox.removePath,
-    resolvePath: sandbox.resolvePath,
-    setNetworkPolicy: sandbox.setNetworkPolicy,
   };
 }
 
@@ -99,7 +101,7 @@ async function resolveVercelSandbox(input: {
   } catch (error) {
     throw new Error(
       `The ${input.harness} harness requires the current eve sandbox to be a Vercel Sandbox with an exposed port.`,
-      { cause: error },
+      { cause: error }
     );
   }
 }
@@ -111,7 +113,7 @@ function resolveHarnessPorts(input: {
   const ports = input.vercelSandbox.routes.map((route) => route.port);
   if (ports.length === 0) {
     throw new Error(
-      `The ${input.harness} harness requires an exposed Vercel Sandbox port. Configure the sandbox with a ports array.`,
+      `The ${input.harness} harness requires an exposed Vercel Sandbox port. Configure the sandbox with a ports array.`
     );
   }
   return ports;
@@ -121,9 +123,15 @@ async function reserveHarnessBridge(input: {
   readonly ports: readonly number[];
   readonly session: SandboxSession;
   readonly vercelSandbox: VercelSandbox;
-}): Promise<{ readonly settings: HarnessBridgeSettings; release(): Promise<void> }> {
-  const lease = await reserveHarnessPort({ ports: input.ports, sandbox: input.session });
-  const port = lease.port;
+}): Promise<{
+  readonly settings: HarnessBridgeSettings;
+  readonly release: () => Promise<void>;
+}> {
+  const lease = await reserveHarnessPort({
+    ports: input.ports,
+    sandbox: input.session,
+  });
+  const { port } = lease;
   const url = new URL(input.vercelSandbox.domain(port));
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   return {
@@ -135,19 +143,19 @@ async function reserveHarnessBridge(input: {
 async function reserveHarnessPort(input: {
   readonly ports: readonly number[];
   readonly sandbox: SandboxSession;
-}): Promise<{ readonly port: number; release(): Promise<void> }> {
+}): Promise<{ readonly port: number; readonly release: () => Promise<void> }> {
   const owner = randomUUID();
   const result = await input.sandbox.run({
     command:
       `root=${HARNESS_ROOT}/ports; mkdir -p "$root"; ` +
-      `for port in $EVE_HARNESS_PORTS; do ` +
+      "for port in $EVE_HARNESS_PORTS; do " +
       `node -e 'const net=require("node:net"); const server=net.createServer(); ` +
       `server.unref(); server.once("error",()=>process.exit(1)); ` +
       `server.listen(Number(process.argv[1]),"0.0.0.0",()=>server.close(()=>process.exit(0)))' "$port" || continue; ` +
       `if mkdir "$root/$port" 2>/dev/null; then ` +
       `printf '%s' "$EVE_HARNESS_PORT_OWNER" > "$root/$port/owner"; ` +
       `printf '%s' "$port"; exit 0; ` +
-      `fi; done; exit 75`,
+      "fi; done; exit 75",
     env: {
       EVE_HARNESS_PORT_OWNER: owner,
       EVE_HARNESS_PORTS: input.ports.join(" "),
@@ -156,7 +164,7 @@ async function reserveHarnessPort(input: {
   const port = Number(result.stdout.trim());
   if (result.exitCode !== 0 || !input.ports.includes(port)) {
     throw new Error(
-      "No exposed Vercel Sandbox port is available for this HarnessAgent invocation.",
+      "No exposed Vercel Sandbox port is available for this HarnessAgent invocation."
     );
   }
 
@@ -173,7 +181,7 @@ async function reserveHarnessPort(input: {
       });
       if (release.exitCode !== 0) {
         throw new Error(
-          `Failed to release HarnessAgent sandbox port ${port}: ${release.stderr || release.stdout}`,
+          `Failed to release HarnessAgent sandbox port ${port}: ${release.stderr || release.stdout}`
         );
       }
     },
@@ -190,7 +198,7 @@ async function prepareHarnessWorkspace(sandbox: SandboxSession): Promise<void> {
   });
   if (result.exitCode !== 0) {
     throw new Error(
-      `Failed to prepare the harness workspace inside the eve sandbox: ${result.stderr || result.stdout}`,
+      `Failed to prepare the harness workspace inside the eve sandbox: ${result.stderr || result.stdout}`
     );
   }
 }

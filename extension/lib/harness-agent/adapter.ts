@@ -45,28 +45,44 @@ export async function loadHarnessAdapter(input: {
   readonly bridge?: HarnessBridgeSettings;
   readonly harness: HarnessAgentHarness;
   readonly model?: string;
-}): Promise<HarnessAgentAdapter<any>> {
-  const modelSettings = input.model === undefined ? undefined : { model: input.model };
+}): Promise<HarnessAgentAdapter> {
+  const modelSettings =
+    input.model === undefined ? undefined : { model: input.model };
 
+  // biome-ignore lint/style/useDefaultSwitchClause: exhaustive switch over HarnessAgentHarness union
   switch (input.harness) {
     case "claude-code":
-      return (await import("@ai-sdk/harness-claude-code")).createClaudeCode(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-claude-code")).createClaudeCode(
+        bridgeSettings(input)
+      );
     case "cline":
       return (await import("@ai-sdk/harness-cline")).createCline(
-        input.model === undefined ? undefined : { modelId: input.model },
+        input.model === undefined ? undefined : { modelId: input.model }
       );
     case "codex":
-      return (await import("@ai-sdk/harness-codex")).createCodex(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-codex")).createCodex(
+        bridgeSettings(input)
+      );
     case "cursor":
-      return (await import("@ai-sdk/harness-cursor")).createCursor(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-cursor")).createCursor(
+        bridgeSettings(input)
+      );
     case "deepagents":
-      return (await import("@ai-sdk/harness-deepagents")).createDeepAgents(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-deepagents")).createDeepAgents(
+        bridgeSettings(input)
+      );
     case "fx":
-      return (await import("@ai-sdk/harness-fx")).createFx(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-fx")).createFx(
+        bridgeSettings(input)
+      );
     case "grok-build":
-      return (await import("@ai-sdk/harness-grok-build")).createGrokBuild(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-grok-build")).createGrokBuild(
+        bridgeSettings(input)
+      );
     case "opencode":
-      return (await import("@ai-sdk/harness-opencode")).createOpenCode(bridgeSettings(input));
+      return (await import("@ai-sdk/harness-opencode")).createOpenCode(
+        bridgeSettings(input)
+      );
     case "pi":
       return (await import("@ai-sdk/harness-pi")).createPi(modelSettings);
   }
@@ -78,7 +94,11 @@ function bridgeSettings(input: {
   readonly model?: string;
 }): HarnessBridgeSettings & { readonly model?: string } {
   if (input.bridge === undefined) {
-    throw new Error(`The ${input.harness} harness requires an acquired sandbox port.`);
+    throw new Error(
+      `The ${input.harness} harness requires an acquired sandbox port.`
+    );
   }
-  return input.model === undefined ? input.bridge : { ...input.bridge, model: input.model };
+  return input.model === undefined
+    ? input.bridge
+    : { ...input.bridge, model: input.model };
 }

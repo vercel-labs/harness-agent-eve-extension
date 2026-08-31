@@ -1,5 +1,5 @@
 import { HarnessAgent } from "@ai-sdk/harness/agent";
-import { Output, type FlexibleSchema } from "ai";
+import { type FlexibleSchema, Output } from "ai";
 import type { SandboxSession } from "eve/sandbox";
 
 import { loadHarnessAdapter } from "./adapter";
@@ -36,7 +36,9 @@ export async function runHarnessAgent<TOutput = string>(input: {
       output:
         input.outputSchema === undefined
           ? undefined
-          : Output.object({ schema: input.outputSchema as FlexibleSchema<unknown> }),
+          : Output.object({
+              schema: input.outputSchema as FlexibleSchema<unknown>,
+            }),
       permissionMode: "allow-all",
       sandboxConfig: { workDir },
       skills: input.settings.skills,
@@ -50,22 +52,32 @@ export async function runHarnessAgent<TOutput = string>(input: {
       prompt: input.task,
       session,
     });
-    output = (input.outputSchema === undefined ? result.text : result.output) as TOutput;
+    output = (
+      input.outputSchema === undefined ? result.text : result.output
+    ) as TOutput;
   } catch (error) {
     await cleanupHarnessInvocation({ dispose: sandboxHandle.dispose, session });
     throw error;
   }
 
-  const failures = await cleanupHarnessInvocation({ dispose: sandboxHandle.dispose, session });
+  const failures = await cleanupHarnessInvocation({
+    dispose: sandboxHandle.dispose,
+    session,
+  });
   if (failures.length > 0) {
-    throw new AggregateError(failures, "Failed to clean up the HarnessAgent invocation.");
+    throw new AggregateError(
+      failures,
+      "Failed to clean up the HarnessAgent invocation."
+    );
   }
   return output;
 }
 
 async function cleanupHarnessInvocation(input: {
   readonly dispose: () => Promise<void>;
-  readonly session: Awaited<ReturnType<HarnessAgent["createSession"]>> | undefined;
+  readonly session:
+    | Awaited<ReturnType<HarnessAgent["createSession"]>>
+    | undefined;
 }): Promise<unknown[]> {
   const failures: unknown[] = [];
   try {
@@ -81,6 +93,8 @@ async function cleanupHarnessInvocation(input: {
   return failures;
 }
 
+const LEADING_DOT_SLASH = /^\.\//;
+
 function resolveHarnessWorkDir(workingDirectory: string | undefined): string {
   if (workingDirectory === undefined || workingDirectory === ".") {
     return "workspace";
@@ -89,7 +103,9 @@ function resolveHarnessWorkDir(workingDirectory: string | undefined): string {
     workingDirectory.startsWith("/") ||
     workingDirectory.split("/").some((segment) => segment === "..")
   ) {
-    throw new Error("HarnessAgent workingDirectory must stay within the eve workspace.");
+    throw new Error(
+      "HarnessAgent workingDirectory must stay within the eve workspace."
+    );
   }
-  return `workspace/${workingDirectory.replace(/^\.\//, "")}`;
+  return `workspace/${workingDirectory.replace(LEADING_DOT_SLASH, "")}`;
 }

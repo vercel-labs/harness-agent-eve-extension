@@ -1,5 +1,22 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.11/schema.json",
   "extends": ["ultracite/biome/core"],
+  "overrides": [
+    {
+      // eve tool/skill/instruction names derive from file paths; snake_case is required.
+      "includes": [
+        "extension/tools/*.ts",
+        "extension/skills/*.ts",
+        "extension/instructions/*.ts"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ],
   "plugins": ["./node_modules/@felixarntz/biome/rules/all.grit"]
 }
