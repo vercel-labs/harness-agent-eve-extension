@@ -2,6 +2,12 @@
 
 Exposes [AI SDK `HarnessAgent`](https://ai-sdk.dev/docs/ai-sdk-harnesses/harness-agent) as a tool for your [eve](https://eve.dev/) agents.
 
+## Installation
+
+| NPM | PNPM | Bun |
+| --- | --- | --- |
+| `npm install harness-agent-eve-extension` | `pnpm add harness-agent-eve-extension` | `bun add harness-agent-eve-extension` |
+
 ## Usage
 
 Add `agent/extensions/harness-agent.ts` to your eve agent:
