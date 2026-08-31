@@ -22,7 +22,6 @@ jobs:
         id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          release-type: node
 
   publish:
     needs: release-please
