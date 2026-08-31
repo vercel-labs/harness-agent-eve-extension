@@ -2,6 +2,8 @@
 
 Exposes [AI SDK `HarnessAgent`](https://ai-sdk.dev/docs/ai-sdk-harnesses/harness-agent) as a tool for your [eve](https://eve.dev/) agents.
 
+_Very early and experimental. **Use with caution.**_
+
 ## Installation
 
 | NPM | PNPM | Bun |
