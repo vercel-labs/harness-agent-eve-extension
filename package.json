@@ -1,6 +1,10 @@
 {
   "name": "harness-agent-eve-extension",
   "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vercel-labs/harness-agent-eve-extension"
+  },
   "license": "Apache-2.0",
   "type": "module",
   "exports": {
@@ -53,7 +57,7 @@
   },
   "packageManager": "pnpm@11.23.0",
   "engines": {
-    "node": "24.x"
+    "node": "^24.0.0 || ^26.0.0"
   },
   "eve": {
     "extension": {
