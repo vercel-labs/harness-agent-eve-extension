@@ -15,3 +15,6 @@ minimumReleaseAgeExclude:
   - ai
   - eve
   - workflow
+
+overrides:
+  undici: ">=6.24.0"
