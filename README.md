@@ -24,7 +24,7 @@ export default harnessAgent({
 
 With this configuration, your agent will expose a flexible `harness_agent` tool that your eve agent can delegate tasks to. You will be asked to approve the `harness_agent` tool every time the eve agent wants to use it.
 
-> [!CAUTION]
+> [!WARNING]
 > The dynamic `harness_agent` tool is complex to use for agents because it is so flexible.
 >
 > It is therefore recommended to not enable that tool and instead define purpose-specific tools using `HarnessAgent` (see below).
