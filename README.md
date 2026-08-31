@@ -16,6 +16,17 @@ Using `HarnessAgent` in eve requires a network sandbox which exposes at least on
 
 Currently, since eve extensions and tools do not have sufficient access to the eve agent's sandbox backend, this extension requires using Vercel Sandbox.
 
+Here's the minimum configuration needed in your `agent/sandbox.ts` file:
+
+```ts
+import { defineSandbox } from "eve/sandbox";
+import { vercel } from "eve/sandbox/vercel";
+
+export default defineSandbox({
+  backend: vercel({ ports: [4319] }), // At least one free port.
+});
+```
+
 ## Usage
 
 Add `agent/extensions/harness-agent.ts` to your eve agent:
