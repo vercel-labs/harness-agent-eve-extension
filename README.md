@@ -35,7 +35,7 @@ Use `fixedHarnessAgentTools` to expose additional HarnessAgent tools with fixed 
 import harnessAgent from "harness-agent-eve-extension";
 
 export default harnessAgent({
-  exposeDynamicHarnessAgentTool: true,
+  exposeDynamicHarnessAgentTool: false,
   fixedHarnessAgentTools: [
     {
       name: "code_review_harness_agent",
