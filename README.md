@@ -10,6 +10,12 @@ _Very early and experimental. **Use with caution.**_
 | --- | --- | --- |
 | `npm install harness-agent-eve-extension` | `pnpm add harness-agent-eve-extension` | `bun add harness-agent-eve-extension` |
 
+## Prerequisites
+
+Using `HarnessAgent` in eve requires a network sandbox which exposes at least one port, as required by harness adapters whose underlying SDK has to run inside the sandbox.
+
+Currently, since eve extensions and tools do not have sufficient access to the eve agent's sandbox backend, this extension requires using Vercel Sandbox.
+
 ## Usage
 
 Add `agent/extensions/harness-agent.ts` to your eve agent:
