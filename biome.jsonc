@@ -1,0 +1,5 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+  "extends": ["ultracite/biome/core"],
+  "plugins": ["./node_modules/@felixarntz/biome/rules/all.grit"]
+}

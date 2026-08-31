@@ -32,3 +32,11 @@ Keep `eve` as a required wildcard peer so the consumer's eve is the one that run
 eve validates extension compatibility from the generated manifest. Keep the eve
 development dependency pinned exactly so builds remain reproducible. Upgrade it
 when the extension intentionally adopts a newer eve authoring API.
+
+## Workflow Commands
+
+- `pnpm install` — install dependencies
+- `pnpm build` — compile extension
+- `pnpm typecheck` — run TypeScript type checking
+- `pnpm check` — lint/format check via Ultracite
+- `pnpm fix` — auto-fix lint/format issues

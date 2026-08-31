@@ -32,7 +32,9 @@
   "scripts": {
     "build": "eve extension build",
     "prepare": "eve extension build",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "check": "ultracite check",
+    "fix": "ultracite fix"
   },
   "dependencies": {
     "@ai-sdk/harness": "^1.0.87",
@@ -52,9 +54,12 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2",
+    "@felixarntz/biome": "^0.2.0",
     "@types/node": "24.x",
     "eve": "0.44.4",
-    "typescript": "7.0.2"
+    "typescript": "7.0.2",
+    "ultracite": "^7"
   },
   "peerDependencies": {
     "eve": "*"

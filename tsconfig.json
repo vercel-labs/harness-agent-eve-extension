@@ -4,6 +4,10 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@felixarntz/biome/types"
+    ],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
