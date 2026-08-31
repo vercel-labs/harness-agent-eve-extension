@@ -75,3 +75,13 @@ For more information on the example, see [its readme](./examples/coding-agent/RE
 eve does not currently support non-eve subagents, therefore extension provides `HarnessAgent` access via tools. This means there is no native observability for the underlying `HarnessAgent` and no preliminary thought or tool call streaming feedback.
 
 If you give a complex task to the `harness_agent` tool, the tool may therefore run for several minutes without feedback. This does not mean that it's hanging. It should eventually complete its work, unblocking the primary eve agent.
+
+## Contributing
+
+All PR titles must follow [Conventional Commits](https://www.conventionalcommits.org/) (enforced by CI). PRs are squash-merged, so the title becomes the commit message.
+
+Commit types and their effect on versioning:
+- `fix:` → patch release
+- `feat:` → minor release
+- `feat!:` or `BREAKING CHANGE:` footer → major release
+- `chore:`, `docs:`, `ci:`, `refactor:`, `test:`, etc. → no release (not included in changelog)
