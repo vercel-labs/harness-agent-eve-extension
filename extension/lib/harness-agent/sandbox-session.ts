@@ -4,6 +4,10 @@ import type { SandboxSession } from "eve/sandbox";
 
 import type { HarnessBridgeSettings } from "./adapter";
 import { harnessUsesBridge } from "./adapter";
+import {
+  type CredentialBrokering,
+  configureCredentialBrokeringForHarnessRun,
+} from "./credential-brokering";
 import type { HarnessAgentHarness } from "./types";
 
 const HARNESS_ROOT = "/workspace/.eve-harness";
@@ -13,52 +17,95 @@ type VercelSandbox = Awaited<
   ReturnType<typeof import("@vercel/sandbox-drives")["Sandbox"]["get"]>
 >;
 
-type HarnessSandboxSession = SandboxSession & {
+type HarnessSandboxSession = Omit<SandboxSession, "setNetworkPolicy"> & {
+  readonly addRequestTransformations?: (
+    transformations: readonly import("@ai-sdk/harness").HarnessV1RequestTransformation[]
+  ) => PromiseLike<void>;
   readonly description: string;
   readonly defaultWorkingDirectory: string;
 };
 
 export interface HarnessSandboxHandle {
   readonly bridge?: HarnessBridgeSettings;
+  readonly credentialForwarding?: import("@ai-sdk/harness").HarnessV1CredentialForwarding;
   readonly dispose: () => Promise<void>;
   readonly session: HarnessSandboxSession;
 }
 
 export async function createHarnessSandboxHandle(input: {
-  readonly sandbox: SandboxSession;
+  readonly credentialBrokering: CredentialBrokering;
   readonly harness: HarnessAgentHarness;
+  readonly sandbox: SandboxSession;
 }): Promise<HarnessSandboxHandle> {
-  let bridge: HarnessBridgeSettings | undefined;
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op for non-bridge harnesses
-  let dispose = async () => {};
-  let session = adaptSandboxSession(input.sandbox);
-  if (harnessUsesBridge(input.harness)) {
-    const vercelSandbox = await resolveVercelSandbox({
-      harness: input.harness,
-      sandbox: input.sandbox,
-    });
-    const ports = resolveHarnessPorts({
-      harness: input.harness,
-      vercelSandbox,
-    });
-    session = adaptSandboxSession(input.sandbox);
-    await prepareHarnessWorkspace(session);
+  const session = adaptSandboxSession(input.sandbox);
+  await prepareHarnessWorkspace(session);
+
+  if (!harnessUsesBridge(input.harness)) {
+    return {
+      dispose: noCleanup,
+      session,
+    };
+  }
+
+  const vercelSandbox = await resolveVercelSandbox({
+    harness: input.harness,
+    sandbox: input.sandbox,
+  });
+  const ports = resolveHarnessPorts({
+    harness: input.harness,
+    vercelSandbox,
+  });
+  const credentialBrokering = await configureCredentialBrokeringForHarnessRun({
+    credentialBrokering: input.credentialBrokering,
+    vercelSandbox,
+  });
+  try {
     const bridgeLease = await reserveHarnessBridge({
       ports,
       session,
       vercelSandbox,
     });
-    bridge = bridgeLease.settings;
-    dispose = bridgeLease.release;
-  } else {
-    await prepareHarnessWorkspace(session);
+    return {
+      bridge: bridgeLease.settings,
+      credentialForwarding: credentialBrokering.credentialForwarding,
+      dispose: async () => {
+        const failures = await runCleanupOperations([
+          bridgeLease.release,
+          credentialBrokering.cleanup,
+        ]);
+        if (failures.length > 0) {
+          throw new AggregateError(
+            failures,
+            "Failed to release HarnessAgent sandbox resources."
+          );
+        }
+      },
+      session: addRequestTransformations({
+        addRequestTransformations:
+          credentialBrokering.addRequestTransformations,
+        session,
+      }),
+    };
+  } catch (error) {
+    const cleanupFailures = await runCleanupOperations([
+      credentialBrokering.cleanup,
+    ]);
+    if (cleanupFailures.length > 0) {
+      throw createSandboxSetupFailure({ error, failures: cleanupFailures });
+    }
+    throw error;
   }
+}
 
-  return {
-    bridge,
-    dispose,
-    session,
-  };
+function createSandboxSetupFailure(input: {
+  readonly error: unknown;
+  readonly failures: readonly unknown[];
+}): AggregateError {
+  return new AggregateError(
+    [input.error, ...input.failures],
+    "Failed to configure the HarnessAgent sandbox and roll back credential brokering.",
+    { cause: input.error }
+  );
 }
 
 function adaptSandboxSession(sandbox: SandboxSession): HarnessSandboxSession {
@@ -78,7 +125,6 @@ function adaptSandboxSession(sandbox: SandboxSession): HarnessSandboxSession {
         env: { ...options.env, TMPDIR: HARNESS_TEMP },
       });
     },
-    setNetworkPolicy: sandbox.setNetworkPolicy,
     async spawn(options) {
       return await sandbox.spawn({
         ...options,
@@ -89,6 +135,43 @@ function adaptSandboxSession(sandbox: SandboxSession): HarnessSandboxSession {
     writeFile: sandbox.writeFile,
     writeTextFile: sandbox.writeTextFile,
   };
+}
+
+function addRequestTransformations(input: {
+  readonly addRequestTransformations:
+    | ((
+        transformations: readonly import("@ai-sdk/harness").HarnessV1RequestTransformation[]
+      ) => PromiseLike<void>)
+    | undefined;
+  readonly session: HarnessSandboxSession;
+}): HarnessSandboxSession {
+  if (input.addRequestTransformations === undefined) {
+    return input.session;
+  }
+  return {
+    ...input.session,
+    addRequestTransformations: input.addRequestTransformations,
+  };
+}
+
+async function runCleanupOperations(
+  operations: readonly (() => Promise<void>)[]
+): Promise<unknown[]> {
+  const failures: unknown[] = [];
+  let completion = Promise.resolve();
+  for (const operation of operations) {
+    completion = completion
+      .then(async () => await operation())
+      .catch((error: unknown) => {
+        failures.push(error);
+      });
+  }
+  await completion;
+  return failures;
+}
+
+function noCleanup(): Promise<void> {
+  return Promise.resolve();
 }
 
 async function resolveVercelSandbox(input: {
@@ -121,7 +204,7 @@ function resolveHarnessPorts(input: {
 
 async function reserveHarnessBridge(input: {
   readonly ports: readonly number[];
-  readonly session: SandboxSession;
+  readonly session: Pick<SandboxSession, "run">;
   readonly vercelSandbox: VercelSandbox;
 }): Promise<{
   readonly settings: HarnessBridgeSettings;
@@ -131,18 +214,38 @@ async function reserveHarnessBridge(input: {
     ports: input.ports,
     sandbox: input.session,
   });
-  const { port } = lease;
-  const url = new URL(input.vercelSandbox.domain(port));
-  url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
-  return {
-    release: lease.release,
-    settings: { port, portEndpoint: { url: url.toString() } },
-  };
+  try {
+    const { port } = lease;
+    const url = new URL(input.vercelSandbox.domain(port));
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    return {
+      release: lease.release,
+      settings: { port, portEndpoint: { url: url.toString() } },
+    };
+  } catch (error) {
+    try {
+      await lease.release();
+    } catch (releaseError) {
+      throw createBridgeSetupFailure({ error, releaseError });
+    }
+    throw error;
+  }
+}
+
+function createBridgeSetupFailure(input: {
+  readonly error: unknown;
+  readonly releaseError: unknown;
+}): AggregateError {
+  return new AggregateError(
+    [input.error, input.releaseError],
+    "Failed to configure the HarnessAgent bridge and release its sandbox port.",
+    { cause: input.error }
+  );
 }
 
 async function reserveHarnessPort(input: {
   readonly ports: readonly number[];
-  readonly sandbox: SandboxSession;
+  readonly sandbox: Pick<SandboxSession, "run">;
 }): Promise<{ readonly port: number; readonly release: () => Promise<void> }> {
   const owner = randomUUID();
   const result = await input.sandbox.run({
@@ -188,7 +291,9 @@ async function reserveHarnessPort(input: {
   };
 }
 
-async function prepareHarnessWorkspace(sandbox: SandboxSession): Promise<void> {
+async function prepareHarnessWorkspace(
+  sandbox: Pick<SandboxSession, "run">
+): Promise<void> {
   const result = await sandbox.run({
     command:
       `mkdir -p ${HARNESS_TEMP} && ` +

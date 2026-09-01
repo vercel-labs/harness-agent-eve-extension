@@ -1,6 +1,6 @@
 import { defineExtension } from "eve/extension";
 import { z } from "zod";
-
+import { CREDENTIAL_BROKERING_SCHEMA } from "./lib/harness-agent/credential-brokering";
 import {
   HARNESS_AGENT_HARNESSES_SCHEMA,
   HARNESS_AGENT_MODELS_SCHEMA,
@@ -9,6 +9,7 @@ import {
 
 export default defineExtension({
   config: z.object({
+    credentialBrokering: CREDENTIAL_BROKERING_SCHEMA,
     // Optional model-facing description override for the dynamic `harness_agent` tool.
     dynamicHarnessAgentToolDescription: z.string().optional(),
     // When true, the extension exposes the dynamic `harness_agent` tool.

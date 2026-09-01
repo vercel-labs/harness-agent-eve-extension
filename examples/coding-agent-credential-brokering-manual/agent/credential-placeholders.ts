@@ -1,0 +1,5 @@
+// These are NOT real credentials!! They are just meant to look like some.
+export const AI_GATEWAY_API_KEY_PLACEHOLDER =
+  "vck_7Jf3sQ9mX2pL8nR4wK6tB1yH5dC0aVgUeZxNqM";
+export const VERCEL_OIDC_TOKEN_PLACEHOLDER =
+  "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjQ2Q0YxRjE4In0.eyJpc3MiOiJodHRwczovL29pZGMudmVyY2VsLmNvbSIsInN1YiI6Im93bmVyOnRlYW06cHJvamVjdDpjb2RpbmctYWdlbnQiLCJhdWQiOiJodHRwczovL3ZlcmNlbC5jb20iLCJpYXQiOjE3ODgyMjA4MDAsImV4cCI6MTc4ODIyNDQwMH0.Zm9wR2Q4dk1qN3FMeVRiS2N4V2hQNXJTYTF1RW5DOXpaRjZtSFF4";
