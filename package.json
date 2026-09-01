@@ -42,7 +42,7 @@
     "@standard-schema/spec": "^1.1.0",
     "@vercel/sandbox-drives": "npm:@vercel/sandbox@^2.10.0-beta.0",
     "ai": "^7.0.79",
-    "zod": "4.4.3"
+    "zod": "4.5.4"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
