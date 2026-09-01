@@ -18,6 +18,20 @@ export default harnessAgent({
     },
     {
       description:
+        "Implement requested code changes in the `ms` repository. " +
+        "No need to mention the `ms` project folder explicitly in the task.",
+      harnesses: ["claude-code", "codex", "cursor"],
+      instructions: [
+        "Implement the requested change directly in the repository.",
+        "Inspect the relevant code before editing and preserve unrelated changes.",
+        "Run focused validation for the files you change when practical.",
+        "Briefly summarize what you changed and report the validation results.",
+      ].join("\n"),
+      name: "write_code",
+      workingDirectory: "ms",
+    },
+    {
+      description:
         "Review code in the `ms` repository and provide an assessment. " +
         "No need to mention the `ms` project folder explicitly in the task.",
       harnesses: ["grok-build", "codex", "cursor"],

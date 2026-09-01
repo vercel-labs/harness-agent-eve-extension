@@ -25,9 +25,10 @@ Or:
 
 ## Fixed harness agent tools
 
-The example also preconfigures three purpose-specific tools via `fixedHarnessAgentTools` in `agent/extensions/harness-agent.ts`, each pinned to the `ms` working directory:
+The example also preconfigures four purpose-specific tools via `fixedHarnessAgentTools` in `agent/extensions/harness-agent.ts`, each pinned to the `ms` working directory:
 
 - `explain_code` — explains code read-only, concisely.
+- `write_code` — implements requested code changes and validates them.
 - `review_code` — reviews code read-only and starts its reply with APPROVED, NEUTRAL, or CHANGES-REQUESTED.
 - `security_audit` — audits the repository for security flaws and starts its reply with PASS, NEUTRAL, or FAIL.
 
