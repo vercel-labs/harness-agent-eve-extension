@@ -18,8 +18,12 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
+  "directories": {
+    "doc": "./docs"
+  },
   "scripts": {
     "build": "eve extension build",
     "check": "ultracite check",
