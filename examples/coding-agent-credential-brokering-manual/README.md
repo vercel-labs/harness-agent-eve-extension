@@ -1,6 +1,15 @@
-# Coding agent
+# Coding agent with manual credential brokering
 
 This example delegates coding tasks to the flexible `harness_agent` tool, provided by the `harness-agent-eve-extension` package.
+
+The extension is configured with manual credential brokering. It forwards
+hard-coded fake values for `AI_GATEWAY_API_KEY` and `VERCEL_OIDC_TOKEN` into
+HarnessAgent sandbox processes. The root eve agent owns the corresponding
+Vercel Sandbox network policy: it matches either fake bearer credential and
+injects the real `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN` after the request
+leaves the sandbox.
+
+No other credentials are handled by this example.
 
 Its Vercel Sandbox contains the public [`vercel/ms`](https://github.com/vercel/ms) TypeScript repository at `/workspace/ms`.
 
@@ -10,7 +19,7 @@ The sandbox template clones the current `main` branch and installs its dependenc
 
 Run locally via:
 ```sh
-cd examples/coding-agent
+cd examples/coding-agent-credential-brokering-manual
 pnpm exec eve link
 pnpm dev
 ```

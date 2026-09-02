@@ -1,6 +1,18 @@
 import harnessAgent from "harness-agent-eve-extension";
 
+import {
+  AI_GATEWAY_API_KEY_PLACEHOLDER,
+  VERCEL_OIDC_TOKEN_PLACEHOLDER,
+} from "../credential-placeholders";
+
 export default harnessAgent({
+  credentialBrokering: {
+    mode: "manual",
+    sandboxCredentialOverrides: {
+      AI_GATEWAY_API_KEY: AI_GATEWAY_API_KEY_PLACEHOLDER,
+      VERCEL_OIDC_TOKEN: VERCEL_OIDC_TOKEN_PLACEHOLDER,
+    },
+  },
   exposeDynamicHarnessAgentTool: true,
   fixedHarnessAgentTools: [
     {

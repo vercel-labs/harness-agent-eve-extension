@@ -1,6 +1,12 @@
-# Coding agent
+# Coding agent with automatic credential brokering
 
 This example delegates coding tasks to the flexible `harness_agent` tool, provided by the `harness-agent-eve-extension` package.
+
+The extension is configured with `credentialBrokering: { mode: "auto" }`.
+AI SDK generates credentials that are safe to expose inside the sandbox, and
+the extension installs host-side Vercel Sandbox request transformations that
+replace them with the real credentials only after matching requests leave the
+sandbox.
 
 Its Vercel Sandbox contains the public [`vercel/ms`](https://github.com/vercel/ms) TypeScript repository at `/workspace/ms`.
 
@@ -10,7 +16,7 @@ The sandbox template clones the current `main` branch and installs its dependenc
 
 Run locally via:
 ```sh
-cd examples/coding-agent
+cd examples/coding-agent-credential-brokering-auto
 pnpm exec eve link
 pnpm dev
 ```

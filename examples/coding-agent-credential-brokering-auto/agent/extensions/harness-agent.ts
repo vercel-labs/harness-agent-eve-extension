@@ -1,6 +1,7 @@
 import harnessAgent from "harness-agent-eve-extension";
 
 export default harnessAgent({
+  credentialBrokering: { mode: "auto" },
   exposeDynamicHarnessAgentTool: true,
   fixedHarnessAgentTools: [
     {

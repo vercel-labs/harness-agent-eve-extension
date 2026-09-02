@@ -1,3 +1,4 @@
+import type { HarnessV1CredentialForwarding } from "@ai-sdk/harness";
 import type { HarnessAgentAdapter } from "@ai-sdk/harness/agent";
 
 import type { HarnessAgentHarness } from "./types";
@@ -43,6 +44,7 @@ export interface HarnessBridgeSettings {
 
 export async function loadHarnessAdapter(input: {
   readonly bridge?: HarnessBridgeSettings;
+  readonly credentialForwarding?: HarnessV1CredentialForwarding;
   readonly harness: HarnessAgentHarness;
   readonly model?: string;
 }): Promise<HarnessAgentAdapter> {
@@ -90,15 +92,23 @@ export async function loadHarnessAdapter(input: {
 
 function bridgeSettings(input: {
   readonly bridge?: HarnessBridgeSettings;
+  readonly credentialForwarding?: HarnessV1CredentialForwarding;
   readonly harness: HarnessAgentHarness;
   readonly model?: string;
-}): HarnessBridgeSettings & { readonly model?: string } {
+}): HarnessBridgeSettings & {
+  readonly credentialForwarding?: HarnessV1CredentialForwarding;
+  readonly model?: string;
+} {
   if (input.bridge === undefined) {
     throw new Error(
       `The ${input.harness} harness requires an acquired sandbox port.`
     );
   }
-  return input.model === undefined
-    ? input.bridge
-    : { ...input.bridge, model: input.model };
+  return {
+    ...input.bridge,
+    ...(input.credentialForwarding === undefined
+      ? {}
+      : { credentialForwarding: input.credentialForwarding }),
+    ...(input.model === undefined ? {} : { model: input.model }),
+  };
 }

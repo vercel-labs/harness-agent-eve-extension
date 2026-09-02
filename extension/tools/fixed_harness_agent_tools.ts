@@ -55,6 +55,7 @@ export default defineDynamic({
               async execute(input, ctx) {
                 return await executeFixedHarnessAgentTool({
                   abortSignal: ctx.abortSignal,
+                  credentialBrokering: extension.config.credentialBrokering,
                   sandbox: await ctx.getSandbox(),
                   settings,
                   toolInput: input,
