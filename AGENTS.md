@@ -40,3 +40,10 @@ when the extension intentionally adopts a newer eve authoring API.
 - `pnpm typecheck` — run TypeScript type checking
 - `pnpm check` — lint/format check via Ultracite
 - `pnpm fix` — auto-fix lint/format issues
+
+## Documentation
+
+All usage and configuration documentation belongs into `docs/`.
+
+- New documentation files must be prefixed with a suitable number and linked in `README.md`.
+- The `README.md` file must remain minimal as is.

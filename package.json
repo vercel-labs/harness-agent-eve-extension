@@ -17,8 +17,12 @@
       "default": "./dist/tools/index.mjs"
     }
   },
+  "directories": {
+    "doc": "./docs"
+  },
   "files": [
-    "dist"
+    "dist",
+    "docs"
   ],
   "scripts": {
     "build": "eve extension build",
