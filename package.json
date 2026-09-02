@@ -1,6 +1,6 @@
 {
   "name": "harness-agent-eve-extension",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/vercel-labs/harness-agent-eve-extension"
