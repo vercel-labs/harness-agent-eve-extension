@@ -3,6 +3,7 @@ import type { SandboxSession } from "eve/sandbox";
 import { z } from "zod";
 
 import { HARNESS_AGENT_HARNESSES } from "./adapter";
+import type { CredentialBrokering } from "./credential-brokering";
 import { runHarnessAgent } from "./run";
 import type {
   CreateFixedHarnessAgentToolSettings,
@@ -88,14 +89,16 @@ type CreateFixedHarnessAgentToolRuntimeSettings = Omit<
 
 export async function executeDynamicHarnessAgentTool(input: {
   readonly abortSignal?: AbortSignal;
+  readonly credentialBrokering?: CredentialBrokering;
   readonly sandbox: SandboxSession;
   readonly toolInput: DynamicHarnessAgentToolInput;
 }): Promise<string> {
   const { harness, model, task, ...settings } = input.toolInput;
   return await runHarnessAgent<string>({
     abortSignal: input.abortSignal,
+    credentialBrokering: input.credentialBrokering ?? { mode: "none" },
     harness,
-    model,
+    model: model === "" ? undefined : model,
     sandbox: input.sandbox,
     settings,
     task,
@@ -115,6 +118,7 @@ export type FixedHarnessAgentToolRuntimeSettings = Omit<
 
 export async function executeFixedHarnessAgentTool(input: {
   readonly abortSignal?: AbortSignal;
+  readonly credentialBrokering?: CredentialBrokering;
   readonly sandbox: SandboxSession;
   readonly settings: FixedHarnessAgentToolRuntimeSettings;
   readonly toolInput: FixedHarnessAgentToolInput;
@@ -129,6 +133,7 @@ export async function executeFixedHarnessAgentTool(input: {
   validateModels({ enabledHarnesses, models });
   return await runHarnessAgent<string>({
     abortSignal: input.abortSignal,
+    credentialBrokering: input.credentialBrokering ?? { mode: "none" },
     harness: input.toolInput.harness,
     model: models?.[input.toolInput.harness],
     sandbox: input.sandbox,
@@ -162,11 +167,13 @@ export function createFixedHarnessAgentToolRuntime(
   return {
     async execute(input: {
       readonly abortSignal?: AbortSignal;
+      readonly credentialBrokering?: CredentialBrokering;
       readonly sandbox: SandboxSession;
       readonly toolInput: FixedHarnessAgentToolInput;
     }): Promise<unknown> {
       return await runHarnessAgent({
         abortSignal: input.abortSignal,
+        credentialBrokering: input.credentialBrokering ?? { mode: "none" },
         harness: input.toolInput.harness,
         model: models?.[input.toolInput.harness],
         outputSchema,

@@ -3,11 +3,13 @@ import { type FlexibleSchema, Output } from "ai";
 import type { SandboxSession } from "eve/sandbox";
 
 import { loadHarnessAdapter } from "./adapter";
+import type { CredentialBrokering } from "./credential-brokering";
 import { createHarnessSandboxHandle } from "./sandbox-session";
 import type { HarnessAgentHarness, HarnessAgentSettings } from "./types";
 
 export async function runHarnessAgent<TOutput = string>(input: {
   readonly abortSignal?: AbortSignal;
+  readonly credentialBrokering: CredentialBrokering;
   readonly harness: HarnessAgentHarness;
   readonly model?: string;
   readonly outputSchema?: unknown;
@@ -17,6 +19,7 @@ export async function runHarnessAgent<TOutput = string>(input: {
 }): Promise<TOutput> {
   const workDir = resolveHarnessWorkDir(input.settings.workingDirectory);
   const sandboxHandle = await createHarnessSandboxHandle({
+    credentialBrokering: input.credentialBrokering,
     harness: input.harness,
     sandbox: input.sandbox,
   });
@@ -26,6 +29,7 @@ export async function runHarnessAgent<TOutput = string>(input: {
   try {
     const harness = await loadHarnessAdapter({
       bridge: sandboxHandle.bridge,
+      credentialForwarding: sandboxHandle.credentialForwarding,
       harness: input.harness,
       model: input.model,
     });
@@ -56,7 +60,13 @@ export async function runHarnessAgent<TOutput = string>(input: {
       input.outputSchema === undefined ? result.text : result.output
     ) as TOutput;
   } catch (error) {
-    await cleanupHarnessInvocation({ dispose: sandboxHandle.dispose, session });
+    const failures = await cleanupHarnessInvocation({
+      dispose: sandboxHandle.dispose,
+      session,
+    });
+    if (failures.length > 0) {
+      throw createHarnessInvocationFailure({ error, failures });
+    }
     throw error;
   }
 
@@ -71,6 +81,17 @@ export async function runHarnessAgent<TOutput = string>(input: {
     );
   }
   return output;
+}
+
+function createHarnessInvocationFailure(input: {
+  readonly error: unknown;
+  readonly failures: readonly unknown[];
+}): AggregateError {
+  return new AggregateError(
+    [input.error, ...input.failures],
+    "The HarnessAgent invocation failed and could not be fully cleaned up.",
+    { cause: input.error }
+  );
 }
 
 async function cleanupHarnessInvocation(input: {
