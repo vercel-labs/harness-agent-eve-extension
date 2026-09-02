@@ -1,19 +1,11 @@
 # Coding agent with manual credential brokering
 
-This example delegates coding tasks to the flexible `harness_agent` tool, provided by the `harness-agent-eve-extension` package.
+A coding agent example to work on the public [`vercel/ms`](https://github.com/vercel/ms) repository using manual credential brokering.
 
-The extension is configured with manual credential brokering. It forwards
-hard-coded fake values for `AI_GATEWAY_API_KEY` and `VERCEL_OIDC_TOKEN` into
-HarnessAgent sandbox processes. The root eve agent owns the corresponding
-Vercel Sandbox network policy: it matches either fake bearer credential and
-injects the real `AI_GATEWAY_API_KEY` or `VERCEL_OIDC_TOKEN` after the request
-leaves the sandbox.
-
-No other credentials are handled by this example.
-
-Its Vercel Sandbox contains the public [`vercel/ms`](https://github.com/vercel/ms) TypeScript repository at `/workspace/ms`.
-
-The sandbox template clones the current `main` branch and installs its dependencies. When a new eve session first uses the sandbox, the example pulls the latest code and installs dependencies.
+- Clones `ms` into a Vercel Sandbox and installs its dependencies.
+- Uses `harness-agent-eve-extension` to provide fixed `explain_code`, `write_code`, `review_code`, and `security_audit` tools, each pinned to the `ms` working directory.
+- Disables the dynamic `harness_agent` tool.
+- Configures manual brokering for `AI_GATEWAY_API_KEY` and `VERCEL_OIDC_TOKEN` using sandbox placeholders and a Vercel Sandbox network policy.
 
 ## Usage
 
@@ -26,21 +18,8 @@ pnpm dev
 
 Ask something like:
 
-> Use the fx harness to explain what the `ms` project does.
+> Use the explain_code tool to explain what the `ms` project does.
 
 Or:
 
-> Use the Codex harness to add different locale support to ms, e.g. so that strings like "2 Tage" work just as well as "2 days".
-
-## Fixed harness agent tools
-
-The example also preconfigures four purpose-specific tools via `fixedHarnessAgentTools` in `agent/extensions/harness-agent.ts`, each pinned to the `ms` working directory:
-
-- `explain_code` — explains code read-only, concisely.
-- `write_code` — implements requested code changes and validates them.
-- `review_code` — reviews code read-only and starts its reply with APPROVED, NEUTRAL, or CHANGES-REQUESTED.
-- `security_audit` — audits the repository for security flaws and starts its reply with PASS, NEUTRAL, or FAIL.
-
-Ask something like:
-
-> Use the explain_code tool to walk me through the parser in ms.
+> Use the write_code tool to add different locale support to ms, e.g. so that strings like "2 Tage" work just as well as "2 days".

@@ -243,22 +243,19 @@ as ambiguous. Manual mode does not validate or install the root agent's
 firewall transformation; an incomplete or mismatched policy leaves the
 sandbox unable to authenticate.
 
-### Example
+### Examples
 
-This repo includes a basic coding agent example in `examples/coding-agent`. You can use it for testing the extension end-to-end.
+This repo includes the following examples for testing the extension end-to-end.
 
-Before the first time using it, link it to a Vercel project for credentials:
-```sh
-cd examples/coding-agent
-vc link
-```
+With only fixed `HarnessAgent` tools that have concrete purposes and therefore are straightforward to use:
 
-You can then run it from the repo root:
-```sh
-pnpm --filter coding-agent dev
-```
+- [Coding agent (without credential brokering)](./examples/coding-agent/README.md)
+- [Coding agent with automatic credential brokering](./examples/coding-agent-credential-brokering-auto/README.md)
+- [Coding agent with manual credential brokering](./examples/coding-agent-credential-brokering-manual/README.md)
 
-For more information on the example, see [its readme](./examples/coding-agent/README.md).
+With only the generic `HarnessAgent` tool that can be used for anything but is more complex to use:
+
+- [Harness agent](./examples/harness-agent/README.md)
 
 ## Known caveat
 

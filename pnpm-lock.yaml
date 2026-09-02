@@ -83,7 +83,7 @@ importers:
     dependencies:
       eve:
         specifier: 0.44.4
-        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.89(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
       harness-agent-eve-extension:
         specifier: workspace:*
         version: link:../..
@@ -102,7 +102,7 @@ importers:
     dependencies:
       eve:
         specifier: 0.44.4
-        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.89(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
       harness-agent-eve-extension:
         specifier: workspace:*
         version: link:../..
@@ -121,7 +121,26 @@ importers:
     dependencies:
       eve:
         specifier: 0.44.4
-        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.89(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
+      harness-agent-eve-extension:
+        specifier: workspace:*
+        version: link:../..
+      zod:
+        specifier: 4.4.3
+        version: 4.4.3
+    devDependencies:
+      '@types/node':
+        specifier: 24.x
+        version: 24.13.3
+      typescript:
+        specifier: 7.0.2
+        version: 7.0.2
+
+  examples/harness-agent:
+    dependencies:
+      eve:
+        specifier: 0.44.4
+        version: 0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.89(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
       harness-agent-eve-extension:
         specifier: workspace:*
         version: link:../..
@@ -2924,19 +2943,19 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.5.4
 
-  '@ai-sdk/gateway@4.0.70(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@4.4.3)
-      '@vercel/oidc': 3.2.0
-      zod: 4.4.3
-
   '@ai-sdk/gateway@4.0.70(zod@4.5.4)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
       '@ai-sdk/provider-utils': 5.0.34(zod@4.5.4)
       '@vercel/oidc': 3.2.0
       zod: 4.5.4
+
+  '@ai-sdk/gateway@4.0.71(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.10
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.4.3)
+      '@vercel/oidc': 3.2.0
+      zod: 4.4.3
 
   '@ai-sdk/gateway@4.0.71(zod@4.5.4)':
     dependencies:
@@ -3178,15 +3197,6 @@ snapshots:
       eventsource-parser: 3.1.1
       zod: 4.5.4
 
-  '@ai-sdk/provider-utils@5.0.34(zod@4.4.3)':
-    dependencies:
-      '@ai-sdk/provider': 4.0.9
-      '@standard-schema/spec': 1.1.0
-      '@workflow/serde': 4.1.0
-      eventsource-parser: 3.1.1
-      undici: 8.10.0
-      zod: 4.4.3
-
   '@ai-sdk/provider-utils@5.0.34(zod@4.5.4)':
     dependencies:
       '@ai-sdk/provider': 4.0.9
@@ -3195,6 +3205,15 @@ snapshots:
       eventsource-parser: 3.1.1
       undici: 8.10.0
       zod: 4.5.4
+
+  '@ai-sdk/provider-utils@5.0.35(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.10
+      '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
+      eventsource-parser: 3.1.1
+      undici: 8.10.0
+      zod: 4.4.3
 
   '@ai-sdk/provider-utils@5.0.35(zod@4.5.4)':
     dependencies:
@@ -4623,19 +4642,19 @@ snapshots:
       '@ai-sdk/provider-utils': 5.0.0(zod@4.5.4)
       zod: 4.5.4
 
-  ai@7.0.87(zod@4.4.3):
-    dependencies:
-      '@ai-sdk/gateway': 4.0.70(zod@4.4.3)
-      '@ai-sdk/provider': 4.0.9
-      '@ai-sdk/provider-utils': 5.0.34(zod@4.4.3)
-      zod: 4.4.3
-
   ai@7.0.87(zod@4.5.4):
     dependencies:
       '@ai-sdk/gateway': 4.0.70(zod@4.5.4)
       '@ai-sdk/provider': 4.0.9
       '@ai-sdk/provider-utils': 5.0.34(zod@4.5.4)
       zod: 4.5.4
+
+  ai@7.0.89(zod@4.4.3):
+    dependencies:
+      '@ai-sdk/gateway': 4.0.71(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.10
+      '@ai-sdk/provider-utils': 5.0.35(zod@4.4.3)
+      zod: 4.4.3
 
   ai@7.0.89(zod@4.5.4):
     dependencies:
@@ -4885,9 +4904,9 @@ snapshots:
 
   etag@1.8.1: {}
 
-  eve@0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2):
+  eve@0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.5.4))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2):
     dependencies:
-      ai: 7.0.87(zod@4.4.3)
+      ai: 7.0.87(zod@4.5.4)
       nitro: 3.0.260610-beta(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
       undici: 8.9.0
     optionalDependencies:
@@ -4932,9 +4951,9 @@ snapshots:
       - xml2js
       - zephyr-agent
 
-  eve@0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.87(zod@4.5.4))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2):
+  eve@0.44.4(@opentelemetry/api@1.9.1)(ai@7.0.89(zod@4.4.3))(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2):
     dependencies:
-      ai: 7.0.87(zod@4.5.4)
+      ai: 7.0.89(zod@4.4.3)
       nitro: 3.0.260610-beta(aws4fetch@1.0.20)(jiti@2.7.0)(lru-cache@11.5.2)
       undici: 8.9.0
     optionalDependencies:

@@ -13,7 +13,7 @@ export default harnessAgent({
       VERCEL_OIDC_TOKEN: VERCEL_OIDC_TOKEN_PLACEHOLDER,
     },
   },
-  exposeDynamicHarnessAgentTool: true,
+  exposeDynamicHarnessAgentTool: false,
   fixedHarnessAgentTools: [
     {
       description:
